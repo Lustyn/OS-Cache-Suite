@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="openrs">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../OSRS Server/libs/openrs.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

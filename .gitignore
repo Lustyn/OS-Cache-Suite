@@ -218,3 +218,4 @@ pip-log.txt
 out/
 data/client/*
 cache_export.json
+.idea/
