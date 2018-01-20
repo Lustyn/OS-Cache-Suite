@@ -1,6 +1,9 @@
 package com.osrs.suite.editors.impl;
 
 import com.alex.io.InputStream;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.osrs.suite.cache.definitions.AnimationDefinition;
 import com.osrs.suite.cache.definitions.ItemDefinition;
 import com.osrs.suite.editors.Editor;
@@ -15,7 +18,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Allen Kinzalow on 3/14/2015.
@@ -65,7 +72,6 @@ public class ItemDefEditor extends Editor {
     final InputField ambient = new InputField("Ambient: ", 140, 20);
     final InputField contrast = new InputField("Constrast: ", 140, 20);
     final InputField team = new InputField("Team: ", 140, 20);
-
 
     @Override
     public void setupEditor(Tab tab) {
@@ -184,7 +190,30 @@ public class ItemDefEditor extends Editor {
                 }
             }
         });
-        inputH.getChildren().addAll(search.getLabel(), search.getTextField(), searchButton);
+        Button saveOutputButton = new Button("Save to JSON");
+        saveOutputButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                HashMap<String, ItemDefinition> definitionMap = new HashMap<String, ItemDefinition>();
+                for(int index = 0; index < defEditor.getStore().getIndexes()[ItemDefinition.INDEX_ID].getValidFilesCount(ItemDefinition.ARCHIVE_ID); index++) {
+                    ItemDefinition definition = new ItemDefinition(index);
+                    definition.decode(new InputStream(defEditor.getStore().getIndexes()[ItemDefinition.INDEX_ID].getFile(ItemDefinition.ARCHIVE_ID,index)));
+                    definitionMap.put(String.valueOf(index), definition);
+                }
+                String json = gson.toJson(definitionMap);
+                File file = new File("./cache_export.json");
+                try(FileWriter writer = new FileWriter(file, false);) {
+                    writer.write(json);
+                    writer.flush();
+                    writer.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        inputH.getChildren().addAll(search.getLabel(), search.getTextField(), searchButton, saveOutputButton);
 
         VBox buttons = new VBox();
         buttons.setPadding(new Insets(10,0,10,0));
